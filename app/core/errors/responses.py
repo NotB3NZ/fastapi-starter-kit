@@ -1,7 +1,7 @@
 from typing import Any, Dict, Optional
 
-from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 from starlette.responses import JSONResponse
+from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 
 from app.core.schema.error import ErrorResponseSchema
 

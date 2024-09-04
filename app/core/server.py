@@ -3,6 +3,7 @@ from typing import Callable
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import ORJSONResponse
 
 from app.core.errors import (
     http_exception_handler,
@@ -25,6 +26,7 @@ def create_fastapi_app(
         description=desc,
         openapi_url=f"{prefix}/openapi.json",
         lifespan=lifespan,
+        default_response_class=ORJSONResponse,
     )
 
     register_cors(app, cors_origin)

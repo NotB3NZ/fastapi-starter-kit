@@ -1,4 +1,4 @@
-from pydantic import field_validator, ValidationInfo
+from pydantic import ValidationInfo, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -13,17 +13,18 @@ class Settings(BaseSettings):
     # e.g: '["http://localhost", "http://localhost:4200", "http://localhost:3000", \
     # "http://localhost:8080", "http://local.dockertoolbox.tiangolo.com"]'
     CORS_ORIGINS: str | list[str] = ["127.0.0.1", "0.0.0.0"]
+
     REDIS_HOST: str = "redis"
     REDIS_PORT: str = "6379"
     REDIS_PASS: str = ""
-    REDIS_AUTH: str = f":{REDIS_PASS}@" if REDIS_PASS else ""
-    DB_ECHO_LOG: bool = True
+
     DB_HOST: str
     DB_PORT: str
     DB_NAME: str
     DB_USERNAME: str
     DB_PASSWORD: str
     DB_URL: str = ""
+
     TIME_ZONE: str = "Asia/Dhaka"
     LOG_LEVEL: str = "DEBUG"
     LOG_FORMAT: str = (
@@ -36,8 +37,10 @@ class Settings(BaseSettings):
 
     @field_validator("DB_URL", mode="before")
     def prepare_db_url(cls, value, info: ValidationInfo):
-        return (f"postgresql+psycopg://{info.data.get('DB_USERNAME')}:{info.data.get('DB_PASSWORD')}"
-                f"@{info.data.get('DB_HOST')}:{info.data.get('DB_PORT')}/{info.data.get('DB_NAME')}")
+        return (
+            f"postgresql+psycopg://{info.data.get('DB_USERNAME')}:{info.data.get('DB_PASSWORD')}"
+            f"@{info.data.get('DB_HOST')}:{info.data.get('DB_PORT')}/{info.data.get('DB_NAME')}"
+        )
 
     @field_validator("CORS_ORIGINS")
     def assemble_cors_origins(cls, v: str | list[str]):

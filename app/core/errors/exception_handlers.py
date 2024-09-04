@@ -1,6 +1,6 @@
 from fastapi import Request
-from fastapi.exceptions import RequestValidationError
 from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
 from app.core.errors.api_exception import APIException

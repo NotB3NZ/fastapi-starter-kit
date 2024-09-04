@@ -1,5 +1,7 @@
-from pydantic import field_validator
 from typing import Optional
+
+from pydantic import field_validator
+
 from app.core.schema import PydanticModel
 
 

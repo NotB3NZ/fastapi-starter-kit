@@ -3,10 +3,6 @@
 .vscode
 __pycache__/
 
-# Docker Volumes to Ignore
-scylladata
-BEFTNDrive
-
 # Distribution / packaging
 .Python
 build/
@@ -26,6 +22,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+.venv
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
