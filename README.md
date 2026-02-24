@@ -20,7 +20,7 @@ A production-ready FastAPI starter template with PostgreSQL, Redis, Docker Compo
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/shopnilsazal/fastapi-starter-kit.git
 cd fastapi-starter-kit
 ```
 
@@ -30,7 +30,7 @@ Create a `.env` file in the project root (a default one is included):
 
 ```env
 POSTGRES_USER=app_user
-POSTGRES_PASSWORD=HelloDB!234
+POSTGRES_PASSWORD=Pass1234
 POSTGRES_DB=app_db
 DB_HOST=database
 DB_PORT=5432
@@ -93,20 +93,76 @@ docker compose restart backend
 docker compose exec backend bash
 ```
 
+## Code Quality & Git Hooks
+
+This project uses [pre-commit](https://pre-commit.com/) to run code-quality checks automatically on every commit.
+
+### Hooks Overview
+
+| Hook            | Stage        | What it does                          |
+|-----------------|--------------|---------------------------------------|
+| **ruff**        | `commit`     | Lints Python files and auto-fixes issues |
+| **ruff-format** | `commit`     | Formats Python files (Black-compatible)  |
+| **gitlint**     | `commit-msg` | Enforces [Conventional Commits](https://www.conventionalcommits.org/) style |
+
+### Setup
+
+```bash
+# Install dev dependencies (includes pre-commit & ruff)
+uv sync
+
+# Install the git hooks
+pre-commit install
+pre-commit install --hook-type commit-msg   # required for gitlint
+```
+
+### Manual Usage
+
+```bash
+# Run all hooks against every file
+pre-commit run --all-files
+
+# Run ruff linter / formatter standalone
+ruff check . --fix
+ruff format .
+
+# Lint the last commit message
+gitlint --commit HEAD
+```
+
+### Commit Message Convention
+
+Gitlint enforces **Conventional Commits**. Allowed types:
+
+`story` · `epic` · `fix` · `feat` · `chore` · `docs` · `style` · `refactor` · `perf` · `test` · `revert` · `ci` · `build`
+
+Example:
+
+```
+feat: add user authentication endpoint
+```
+
+> [!NOTE]
+> Title must be 5–90 characters. Merge, revert, fixup, and squash commits are automatically ignored.
+
+---
+
 ## Project Structure
 
 ```
 fastapi-starter-kit/
 ├── app/
-│   ├── api/              # API route definitions
-│   ├── core/             # Config, database, middleware, server setup
-│   └── main.py           # Application entrypoint
-├── Dockerfile            # Multi-stage Docker build
-├── docker-compose.yml    # Service orchestration
-├── pyproject.toml        # Python dependencies (managed by uv)
-├── uv.lock               # Lockfile
-├── ruff.toml             # Linter / formatter config
-└── .env                  # Environment variables
+│   ├── api/                 # API route definitions
+│   ├── core/                # Config, database, middleware, server setup
+│   └── main.py              # Application entrypoint
+├── Dockerfile               # Multi-stage Docker build
+├── docker-compose.yml       # Service orchestration
+├── pyproject.toml           # Python dependencies (managed by uv)
+├── uv.lock                  # Lockfile
+├── ruff.toml                # Linter / formatter config
+├── .pre-commit-config.yaml  # Pre-commit hook definitions
+├── .gitlint                 # Gitlint commit-msg rules
+└── .env                     # Environment variables
 ```
 
 ## Local Development (Without Docker)
