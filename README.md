@@ -180,6 +180,10 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8008
 > [!NOTE]
 > You'll need a running PostgreSQL and Redis instance accessible from your machine. Update `DB_HOST` in `.env` to `localhost` (instead of `database`) when running outside Docker.
 
+## Contributing
+
+We welcome contributions! Please read our [Contributing Guide](CONTRIBUTING.md) for details on how to get started, our code quality standards, commit conventions, and the pull request process.
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
