@@ -1,59 +1,69 @@
-from fastapi import Depends
+from fastapi import Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.v1.users.repository import UserRepository
-from app.api.v1.users.schemas import UserCreate, UserResponse, UserUpdate
+from app.api.v1.users.models import User
+from app.api.v1.users.schemas import (
+    SingleUserAPIResponse,
+    UserCreateRequest,
+    UserListAPIResponse,
+    UserListResponse,
+    UserResponse,
+    UserUpdateRequest,
+)
 from app.api.v1.users.services import UserService
 from app.core.db.database import get_db_session
 
-# ── Dependency chain ─────────────────────────────────────────────
-# Session → Repository → Service  (handed to each view automatically)
+
+def single_user_response(user: User) -> SingleUserAPIResponse:
+    return SingleUserAPIResponse(data=UserResponse.model_validate(user))
 
 
-def get_user_service(session: AsyncSession = Depends(get_db_session)) -> UserService:
-    return UserService(UserRepository(session))
-
-
-# ── Views (The Chef's dishes) ───────────────────────────────────
+def user_list_response(users: list[User], total: int) -> UserListAPIResponse:
+    return UserListAPIResponse(
+        data=UserListResponse(
+            items=[UserResponse.model_validate(u) for u in users],
+            total=total,
+        )
+    )
 
 
 async def create_user(
-    user_in: UserCreate,
-    service: UserService = Depends(get_user_service),
-) -> UserResponse:
-    user = await service.create_user(user_in)
-    return UserResponse.model_validate(user)
+    payload: UserCreateRequest,
+    session: AsyncSession = Depends(get_db_session),
+) -> SingleUserAPIResponse:
+    user = await UserService(session).create(payload)
+    return single_user_response(user)
+
+
+async def list_users(
+    limit: int = Query(default=20, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
+    session: AsyncSession = Depends(get_db_session),
+) -> UserListAPIResponse:
+    users, total = await UserService(session).list_all(limit, offset)
+    return user_list_response(users, total)
 
 
 async def get_user(
     user_id: int,
-    service: UserService = Depends(get_user_service),
-) -> UserResponse:
-    user = await service.get_user(user_id)
-    return UserResponse.model_validate(user)
-
-
-async def list_users(
-    skip: int = 0,
-    limit: int = 100,
-    service: UserService = Depends(get_user_service),
-) -> list[UserResponse]:
-    users = await service.list_users(skip=skip, limit=limit)
-    return [UserResponse.model_validate(u) for u in users]
+    session: AsyncSession = Depends(get_db_session),
+) -> SingleUserAPIResponse:
+    user = await UserService(session).get(user_id)
+    return single_user_response(user)
 
 
 async def update_user(
     user_id: int,
-    user_in: UserUpdate,
-    service: UserService = Depends(get_user_service),
-) -> UserResponse:
-    user = await service.update_user(user_id, user_in)
-    return UserResponse.model_validate(user)
+    payload: UserUpdateRequest,
+    session: AsyncSession = Depends(get_db_session),
+) -> SingleUserAPIResponse:
+    user = await UserService(session).update(user_id, payload)
+    return single_user_response(user)
 
 
 async def deactivate_user(
     user_id: int,
-    service: UserService = Depends(get_user_service),
-) -> UserResponse:
-    user = await service.deactivate_user(user_id)
-    return UserResponse.model_validate(user)
+    session: AsyncSession = Depends(get_db_session),
+) -> SingleUserAPIResponse:
+    user = await UserService(session).deactivate(user_id)
+    return single_user_response(user)
