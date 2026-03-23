@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from app.api.events.routes import router as events_router
 from app.core.config import settings
 from app.core.db.cache import connect_cache_db, disconnect_cache_db
 from app.core.db.database import session_manager
@@ -27,6 +28,9 @@ app = create_fastapi_app(
     debug=settings.DEBUG,
     lifespan=app_lifespan,
 )
+
+# Register routers here
+app.include_router(events_router, prefix=settings.API_V1_PREFIX)
 
 # Register middleware here
 app.add_middleware(LoggingMiddleware)
